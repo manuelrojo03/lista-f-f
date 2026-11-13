@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Downtown Studios F&amp;F</title>
+<link rel="icon" href="img/isotipo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Par P01 del manual: lila domina (modo WORK), damasco acento, blanco da aire */
+  --lila:#482783;
+  --damasco:#FFAA78;
+  --crema:#F5F3EA;
+  --negro:#222329;
+  --hormigon:#9A9893;
+  --lila-suave:#EFEAF6;
+  --linea:#E4E0EC;
+  --display:"Anton","Impact","Arial Narrow",sans-serif;
+  --body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  /* Layout: banda lila con la firma, "corte" de dos campos, lista de unidades, ficha a pantalla completa */
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:#fff;color:var(--negro);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--damasco);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.num{font-variant-numeric:tabular-nums}
+
+/* Banda superior */
+.top{background:var(--lila)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:14px;padding-bottom:14px;flex-wrap:wrap}
+.top img{width:300px;height:auto}
+.top .etapa{color:var(--crema);font-size:13px;font-weight:600;letter-spacing:.04em;display:flex;align-items:center;gap:10px}
+.rombo{width:10px;height:10px;background:var(--damasco);transform:rotate(45deg);display:inline-block;flex:none}
+
+/* El corte: dos campos de color */
+.corte{display:grid;grid-template-columns:1fr}
+.corte .a{background:var(--lila);color:var(--crema);padding:40px max(24px,calc((100vw - 1180px)/2 + 24px)) 48px}
+.corte .b{background:var(--damasco);color:var(--lila);padding:36px max(24px,calc((100vw - 1180px)/2 + 24px));display:grid;grid-template-columns:repeat(3,1fr);gap:18px 32px}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-transform:uppercase;letter-spacing:.005em;text-wrap:balance;margin:0;line-height:.98}
+.corte h1{font-size:clamp(48px,7vw,88px);color:var(--damasco)}
+.corte p{max-width:34em;margin:16px 0 0;font-size:17px}
+.dato{display:grid;gap:2px}
+.dato b{font-family:var(--display);font-weight:400;font-size:clamp(30px,3.6vw,42px);line-height:1}
+.dato span{font-size:14px;font-weight:600}
+
+/* Barra de filtros */
+.filtros{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-top:28px;padding-bottom:14px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1.5px solid var(--lila);background:#fff;color:var(--lila);border-radius:999px;padding:7px 15px;font-size:14px;font-weight:600;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--lila);color:var(--crema)}
+.orden{display:flex;align-items:center;gap:8px;font-size:14px;color:#55535a}
+.orden select{font:inherit;font-weight:600;color:var(--lila);border:1.5px solid var(--linea);border-radius:8px;padding:6px 10px;background:#fff}
+
+/* Lista */
+.lista{border-top:2px solid var(--lila);margin-bottom:24px}
+.cab,.fila{display:grid;grid-template-columns:76px 1.1fr 1.3fr 1.3fr 150px 28px;gap:20px;align-items:center}
+.cab{font-size:12px;font-weight:600;color:#6d6a73;text-transform:uppercase;letter-spacing:.06em;padding:10px 12px;border-bottom:1px solid var(--linea)}
+.fila{padding:12px;border-bottom:1px solid var(--linea);cursor:pointer;background:#fff;text-align:left;width:100%;border-left:0;border-right:0;border-top:0;transition:background .15s}
+.fila:hover{background:var(--lila-suave)}
+.fila .mini{width:60px;height:90px;object-fit:contain;border:1px solid var(--linea);background:#fff}
+.u-num{font-family:var(--display);font-size:38px;line-height:1;color:var(--lila)}
+.u-piso{font-size:13px;color:#6d6a73;font-weight:500;margin-top:4px}
+.big{font-weight:700;font-size:18px}
+.sub{font-size:13px;color:#6d6a73}
+.estado{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;padding:5px 11px;border-radius:999px;white-space:nowrap}
+.pill.disp{background:#E7F3E3;color:#2F5D26}
+.pill.res{background:var(--lila);color:var(--crema)}
+.pill.res .rombo{background:var(--damasco)}
+.pill.disp .rombo{background:#4E8A40}
+.fila.reservada .u-num{color:var(--hormigon)}
+.fila.reservada .mini{opacity:.5}
+.flecha{color:var(--lila);font-size:22px;font-weight:600}
+.vacio{padding:28px 12px;color:#6d6a73}
+
+/* Interruptor: la O de STUDIOS */
+.switch{display:inline-flex;align-items:center;gap:10px;background:none;border:0;padding:0;cursor:pointer;font-size:13px;font-weight:600}
+.switch .caps{position:relative;width:58px;height:30px;border-radius:999px;background:var(--damasco);transition:background .4s ease;flex:none}
+.switch .caps i{position:absolute;top:50%;left:10px;width:12px;height:12px;background:var(--lila);transform:translateY(-50%) rotate(45deg);transition:left .4s ease,background .4s ease}
+.switch[aria-checked="true"] .caps{background:var(--lila)}
+.switch[aria-checked="true"] .caps i{left:36px;background:var(--damasco)}
+.switch:disabled{opacity:.5;cursor:wait}
+.panel-edit .switch .caps{box-shadow:0 0 0 2px var(--crema)}
+
+.nota{font-size:13px;color:#6d6a73;max-width:70em;margin:0 0 40px}
+
+/* Pie */
+.pie{background:var(--lila);color:var(--crema)}
+.pie .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;padding-top:34px;padding-bottom:34px}
+.pie h2{font-size:clamp(34px,4.5vw,52px);color:var(--damasco)}
+.pie img{width:300px}
+
+/* Ficha */
+.ficha{position:fixed;inset:0;background:#fff;z-index:20;overflow-y:auto;display:none}
+.ficha.abierta{display:block}
+.f-top{background:var(--lila);color:var(--crema);position:sticky;top:0;z-index:2}
+.f-top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:18px;padding-bottom:18px;flex-wrap:wrap}
+.f-tit{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
+.f-tit h2{font-size:clamp(40px,6vw,64px);color:var(--damasco)}
+.f-tit .piso{font-weight:600;display:flex;align-items:center;gap:8px}
+.f-acc{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn{border:1.5px solid var(--crema);background:transparent;color:var(--crema);border-radius:999px;padding:8px 16px;font-size:14px;font-weight:600;cursor:pointer}
+.btn:hover{background:rgba(245,243,234,.12)}
+.btn.cerrar{background:var(--damasco);border-color:var(--damasco);color:var(--lila)}
+.panel-edit{display:flex;align-items:center;gap:10px;color:var(--crema);padding-right:6px}
+.panel-edit[hidden]{display:none}
+.f-cuerpo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:44px;padding-top:32px;padding-bottom:48px}
+.f-plano{background:#fff;border:1px solid var(--linea);padding:12px;align-self:start;position:sticky;top:120px}
+.f-plano img{width:100%;max-height:72vh;object-fit:contain;margin:0 auto}
+.f-datos{display:grid;gap:28px;align-content:start}
+.bloque h3{font-size:24px;color:var(--lila);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.tabla{width:100%;border-collapse:collapse;font-size:15px}
+.tabla td{padding:9px 0;border-bottom:1px solid var(--linea)}
+.tabla td:last-child{text-align:right;font-weight:600;white-space:nowrap;padding-left:12px}
+.tabla tr.total td{border-bottom:2px solid var(--lila);font-weight:700;color:var(--lila)}
+.precio{background:var(--damasco);color:var(--lila);padding:22px 24px;display:grid;gap:4px}
+.precio .et{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.precio .valor{font-family:var(--display);font-size:clamp(44px,5.5vw,60px);line-height:1}
+.precio .m2{font-weight:600}
+.evo{display:grid;gap:12px}
+.barra{display:grid;grid-template-columns:118px 1fr;gap:12px;align-items:center}
+.barra .lab{font-size:14px;font-weight:600}
+.barra .lab small{display:block;font-weight:500;color:#6d6a73;font-size:12px}
+.barra .pista{background:var(--lila-suave);height:38px;position:relative}
+.barra .fill{position:absolute;left:0;top:0;bottom:0;background:var(--lila);display:flex;align-items:center;justify-content:flex-end;padding:0 10px;color:var(--crema);font-weight:700;font-size:14px;white-space:nowrap}
+.barra.hoy .fill{background:var(--damasco);color:var(--lila)}
+.ganancia{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-top:2px solid var(--lila);padding-top:10px;color:var(--lila);font-weight:700;flex-wrap:wrap}
+.ganancia b{font-family:var(--display);font-weight:400;font-size:32px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+.ubic .mapa{border:1px solid var(--linea);background:#fff;padding:8px 10px}
+.ubic img{width:100%}
+.lado{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--lila);justify-content:center}
+.lado.g{margin-bottom:6px}.lado.a{margin-top:6px}
+.lado.activo{color:var(--negro)}
+.lado.activo::after{content:"";width:8px;height:8px;background:var(--damasco);transform:rotate(45deg)}
+.ubic p{font-size:13px;color:#6d6a73;margin:8px 0 0}
+.leyenda{font-size:12px;color:#6d6a73}
+.f-nav{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--linea);padding-top:20px;margin-top:4px}
+.f-nav button{background:none;border:1.5px solid var(--lila);color:var(--lila);border-radius:999px;padding:8px 16px;font-weight:600;cursor:pointer}
+.f-nav button:disabled{opacity:.3;cursor:default}
+.modal{position:fixed;inset:0;background:rgba(34,35,41,.55);z-index:30;display:none;align-items:center;justify-content:center;padding:16px}
+.modal.abierto{display:flex}
+.caja{background:#fff;width:min(460px,100%);max-height:calc(100% - 32px);overflow:auto}
+.caja .cab-m{background:var(--lila);color:var(--damasco);padding:18px 22px}
+.caja .cab-m h2{font-size:34px}
+.caja .cab-m p{color:var(--crema);margin:6px 0 0;font-size:14px}
+.caja form,.caja .cuerpo-m{padding:20px 22px 22px;display:grid;gap:14px}
+.campo{display:grid;gap:5px}
+.campo[hidden]{display:none}
+.campo label{font-size:13px;font-weight:600;color:var(--lila)}
+.campo input{font:inherit;border:1.5px solid var(--linea);border-radius:8px;padding:10px 12px}
+.campo input:focus{border-color:var(--lila);outline:none}
+.error{color:#A3261B;font-size:13px;min-height:1em;margin:0}
+.botones{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.b-pri{background:var(--lila);color:var(--crema);border:0;border-radius:999px;padding:10px 18px;font-weight:600;cursor:pointer}
+.b-sec{background:#fff;color:var(--lila);border:1.5px solid var(--lila);border-radius:999px;padding:9px 18px;font-weight:600;cursor:pointer}
+.b-pri:disabled{opacity:.5;cursor:wait}
+.reservas{margin:8px 0 48px;border-top:2px solid var(--lila);padding-top:22px}
+.reservas[hidden]{display:none}
+.res-cab{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.res-cab h2{font-size:34px;color:var(--lila)}
+.res-cab p{margin:4px 0 0;font-size:13px;color:#6d6a73}
+.tabla-res{width:100%;border-collapse:collapse;font-size:14px}
+.tabla-res th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#6d6a73;font-weight:600;padding:8px 10px;border-bottom:1px solid var(--linea)}
+.tabla-res td{padding:10px;border-bottom:1px solid var(--linea)}
+.tabla-res td.u{font-family:var(--display);font-size:22px;color:var(--lila)}
+.scroll{overflow-x:auto}
+.acceso{padding-bottom:18px;display:flex;justify-content:flex-end}
+.acceso button{background:none;border:0;color:var(--crema);opacity:.6;font-size:12px;cursor:pointer;padding:4px 0;text-decoration:underline}
+.acceso button:hover{opacity:1}
+.acceso button[hidden]{display:none}
+.medios{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;padding-top:28px}
+.tile{position:relative;display:block;border:0;padding:0;background:var(--lila);cursor:pointer;text-align:left;overflow:hidden;aspect-ratio:16/8}
+.tile img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+.tile:hover img{transform:scale(1.03)}
+.tile .rot{position:absolute;left:0;right:0;bottom:0;background:var(--lila);color:var(--damasco);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tile .rot b{font-family:var(--display);font-weight:400;font-size:28px;text-transform:uppercase;line-height:1}
+.tile .rot span{color:var(--crema);font-size:13px;font-weight:600}
+.tile .play{position:absolute;top:50%;left:50%;width:64px;height:64px;margin:-52px 0 0 -32px;border-radius:50%;background:var(--damasco);display:grid;place-items:center}
+.tile .play::after{content:"";border-left:20px solid var(--lila);border-top:12px solid transparent;border-bottom:12px solid transparent;margin-left:5px}
+.visor{position:fixed;inset:0;background:var(--negro);z-index:25;display:none;flex-direction:column}
+.visor.abierto{display:flex}
+.v-top{background:var(--lila)}
+.v-top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:14px;padding-bottom:14px}
+.v-top h2{color:var(--damasco);font-size:clamp(32px,4.5vw,48px)}
+.v-cuerpo{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px 16px;overflow:hidden}
+.v-cuerpo video,.v-cuerpo .foto{flex:1 1 auto;min-height:0;width:100%;max-width:1400px;object-fit:contain}
+.v-cuerpo video{background:#000}
+.v-pie{flex:none;display:flex;align-items:center;gap:14px;color:var(--crema);font-size:14px;flex-wrap:wrap;justify-content:center}
+.v-nav{background:none;border:1.5px solid var(--crema);color:var(--crema);border-radius:999px;width:44px;height:44px;font-size:20px;cursor:pointer}
+.miniaturas{display:flex;gap:8px;flex:none;max-width:100%;overflow-x:auto;padding-bottom:4px}
+.miniaturas button{flex:none}
+.miniaturas button{border:2px solid transparent;padding:0;background:none;cursor:pointer;width:96px;aspect-ratio:16/9;overflow:hidden;opacity:.6}
+.miniaturas button[aria-current="true"]{border-color:var(--damasco);opacity:1}
+.miniaturas img{width:100%;height:100%;object-fit:cover}
+.f-vistas{display:grid;gap:10px}
+.f-vistas button{border:0;padding:0;background:none;cursor:pointer;position:relative;display:block}
+.f-vistas img{width:100%;aspect-ratio:16/9;object-fit:cover}
+.f-vistas span{position:absolute;right:10px;bottom:10px;background:var(--lila);color:var(--crema);font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--negro);color:var(--crema);padding:10px 16px;border-radius:8px;font-size:14px;z-index:40;display:none;max-width:calc(100% - 32px)}
+
+@media (max-width:900px){
+  .corte .a,.corte .b{padding:32px 20px}
+  .cab{display:none}
+  .fila{grid-template-columns:64px 1fr auto;grid-template-areas:"m u f" "m s s" "m p p" "m e e";gap:6px 14px}
+  .fila .mini{grid-area:m;width:56px;height:84px}
+  .fila .c-u{grid-area:u}.fila .c-s{grid-area:s}.fila .c-p{grid-area:p}.fila .c-e{grid-area:e}.fila .flecha{grid-area:f}
+  .f-cuerpo{grid-template-columns:1fr;gap:28px}
+  .f-plano{position:static}
+  .f-plano img{max-height:60vh}
+}
+@media (max-width:520px){
+  .wrap{padding:0 16px}
+  .top img,.pie img{width:min(300px,100%)}
+  .corte .b{grid-template-columns:1fr 1fr}
+  .barra{grid-template-columns:96px 1fr}
+  .duo{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <img src="img/logo-lila.svg" alt="Downtown Studios by Greenville">
+    <div class="etapa"><span class="rombo" aria-hidden="true"></span>Lista Friends &amp; Family · Noviembre 2026</div>
+  </div>
+</header>
+
+<section class="corte">
+  <div class="a">
+    <h1>Friends &amp; Family.</h1>
+  </div>
+  <div class="b">
+    <div class="dato"><b class="num" id="d-disp">15</b><span>studios disponibles</span></div>
+    <div class="dato"><b class="num" id="d-desde">USD 155.280</b><span>desde</span></div>
+    <div class="dato"><b class="num" id="d-sup">68 a 125 m²</b><span>superficie total</span></div>
+  </div>
+</section>
+
+<main class="wrap">
+  <div class="medios">
+    <button type="button" class="tile" id="t-video" aria-label="Ver el video 360">
+      <img src="media/poster_mini.jpg" alt=""><span class="play" aria-hidden="true"></span>
+      <span class="rot"><b>Video 360.</b><span>Vuelo alrededor del edificio</span></span>
+    </button>
+    <button type="button" class="tile" id="t-renders" aria-label="Ver los renders">
+      <img src="media/render_02_mini.jpg" alt="">
+      <span class="rot"><b>Renders.</b><span id="t-renders-n"></span></span>
+    </button>
+    <button type="button" class="tile" id="t-vistas" aria-label="Ver las vistas de las unidades">
+      <img src="vistas/vista_205_mini.jpg" alt="">
+      <span class="rot"><b>Vistas.</b><span>Desde cada unidad</span></span>
+    </button>
+  </div>
+  <div class="filtros">
+    <div class="chips" id="chips" role="group" aria-label="Filtrar por piso"></div>
+    <label class="orden" for="orden">Ordenar por
+      <select id="orden">
+        <option value="piso">Piso y unidad</option>
+        <option value="precio">Precio</option>
+        <option value="sup">Superficie</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="lista" id="lista">
+    <div class="cab" aria-hidden="true"><span>Plano</span><span>Unidad</span><span>Superficie</span><span>Precio</span><span>Estado</span><span></span></div>
+    <div id="filas"></div>
+  </div>
+  <p class="nota">Valores en dólares estadounidenses, plan financiado. Los valores de Lanzamiento y Lista son los precios previstos para esas etapas y pueden cambiar. Planos y superficies ilustrativos, sujetos a la documentación final. Precios vigentes al 13 de noviembre de 2026, sujetos a disponibilidad.</p>
+
+  <section class="reservas" id="reservas" hidden aria-labelledby="res-tit">
+    <div class="res-cab">
+      <div><h2 id="res-tit">Reservas.</h2><p>Los clientes no ven estos datos, solo que la unidad está reservada.</p></div>
+      <div class="botones"><button type="button" class="b-sec" id="btn-cerrar-eq">Cerrar acceso</button><button type="button" class="b-pri" id="btn-excel">Descargar Excel</button></div>
+    </div>
+    <div class="scroll"><table class="tabla-res num" id="tabla-res"></table></div>
+  </section>
+</main>
+
+<footer class="pie">
+  <div class="wrap">
+    <h2>Cambiá de modo.</h2>
+    <img src="img/logo-lila.svg" alt="Downtown Studios by Greenville">
+  </div>
+  <div class="wrap acceso"><button type="button" id="btn-equipo" hidden>Acceso equipo</button></div>
+</footer>
+
+<div class="ficha" id="ficha" role="dialog" aria-modal="true" aria-labelledby="f-titulo">
+  <div class="f-top">
+    <div class="wrap">
+      <div class="f-tit">
+        <h2 id="f-titulo">Unidad 000.</h2>
+        <span class="piso"><span class="rombo" aria-hidden="true"></span><span id="f-piso"></span></span>
+        <span id="f-estado"></span>
+      </div>
+      <div class="f-acc">
+        <div class="panel-edit" id="f-edit" hidden></div>
+        <button class="btn cerrar" id="f-cerrar" type="button">Volver a la lista</button>
+      </div>
+    </div>
+  </div>
+  <div class="wrap f-cuerpo">
+    <div class="f-plano"><img id="f-img" alt=""></div>
+    <div class="f-datos">
+      <div class="duo">
+        <div class="bloque ubic">
+          <h3><span class="rombo" aria-hidden="true"></span>Dónde está.</h3>
+          <div class="mapa">
+            <div class="lado g" id="l-g">↑ Lado Greenville</div>
+            <img id="f-ubic" alt="">
+            <div class="lado a" id="l-a">↓ Lado Abril</div>
+          </div>
+          <p id="f-ubic-txt"></p>
+        </div>
+        <div class="bloque">
+          <h3><span class="rombo" aria-hidden="true"></span>Superficie.</h3>
+          <table class="tabla num" id="f-sup"></table>
+        </div>
+      </div>
+      <div class="precio">
+        <span class="et">Precio Friends &amp; Family</span>
+        <span class="valor num" id="f-precio"></span>
+        <span class="m2 num" id="f-m2"></span>
+      </div>
+      <div class="bloque">
+        <h3><span class="rombo" aria-hidden="true"></span>Vista desde la unidad.</h3>
+        <div class="f-vistas" id="f-vistas"></div>
+      </div>
+      <div class="bloque">
+        <h3><span class="rombo" aria-hidden="true"></span>Cómo evoluciona el precio.</h3>
+        <div class="evo" id="f-evo"></div>
+      </div>
+      <div class="bloque">
+        <h3><span class="rombo" aria-hidden="true"></span>Plan de pago.</h3>
+        <table class="tabla num" id="f-plan"></table>
+      </div>
+      <div class="f-nav">
+        <button type="button" id="f-prev">← Anterior</button>
+        <button type="button" id="f-next">Siguiente →</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal" id="m-res" role="dialog" aria-modal="true" aria-labelledby="m-res-tit">
+  <div class="caja">
+    <div class="cab-m"><h2 id="m-res-tit">Reservar 000.</h2><p id="m-res-sub"></p></div>
+    <form id="f-res" novalidate>
+      <div class="campo"><label for="r-nombre">Nombre</label><input id="r-nombre" autocomplete="off" required></div>
+      <div class="campo"><label for="r-apellido">Apellido</label><input id="r-apellido" autocomplete="off" required></div>
+      <div class="campo"><label for="r-tel">Teléfono</label><input id="r-tel" type="tel" inputmode="tel" autocomplete="off" placeholder="11 2345 6789" required></div>
+      <p class="error" id="r-error" role="alert"></p>
+      <div class="botones"><button type="button" class="b-sec" id="r-cancelar">Cancelar</button><button type="submit" class="b-pri" id="r-ok">Confirmar reserva</button></div>
+    </form>
+  </div>
+</div>
+<div class="modal" id="m-lib" role="dialog" aria-modal="true" aria-labelledby="m-lib-tit">
+  <div class="caja">
+    <div class="cab-m"><h2 id="m-lib-tit">Liberar 000.</h2></div>
+    <div class="cuerpo-m">
+      <p id="m-lib-txt" style="margin:0"></p>
+      <p class="error" id="l-error" role="alert"></p>
+      <div class="botones"><button type="button" class="b-sec" id="l-cancelar">Cancelar</button><button type="button" class="b-pri" id="l-ok">Liberar unidad</button></div>
+    </div>
+  </div>
+</div>
+<div class="modal" id="m-pin" role="dialog" aria-modal="true" aria-labelledby="m-pin-tit">
+  <div class="caja">
+    <div class="cab-m"><h2 id="m-pin-tit">Acceso equipo.</h2><p>Ingresá la contraseña para ver las reservas y reservar unidades.</p></div>
+    <form id="f-pin" novalidate>
+      <div class="campo"><label for="p-1">Contraseña</label><input id="p-1" type="password" autocomplete="off"></div>
+      <p class="error" id="p-error" role="alert"></p>
+      <div class="botones"><button type="button" class="b-sec" id="p-cancelar">Cancelar</button><button type="submit" class="b-pri" id="p-ok">Entrar</button></div>
+    </form>
+  </div>
+</div>
+<div class="visor" id="visor" role="dialog" aria-modal="true" aria-labelledby="v-tit">
+  <div class="v-top"><div class="wrap"><h2 id="v-tit">Video 360.</h2><button class="btn cerrar" id="v-cerrar" type="button">Volver a la lista</button></div></div>
+  <div class="v-cuerpo" id="v-cuerpo"></div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const UNIDADES = [{"u":102,"piso":1,"estado":"Disponible","cub":91.48,"semi":15.7,"tot":107.18,"ff":238855,"lanz":252905,"lista":281006,"reserva":11943,"boleto":71657,"saldo":155256,"cuota":6469},{"u":105,"piso":1,"estado":"Disponible","cub":90.2,"semi":11.92,"tot":102.12,"ff":229160,"lanz":242640,"lista":269600,"reserva":11458,"boleto":68748,"saldo":148954,"cuota":6206},{"u":109,"piso":1,"estado":"Disponible","cub":63.43,"semi":5.95,"tot":69.38,"ff":156278,"lanz":170435,"lista":189373,"reserva":7814,"boleto":46884,"saldo":101581,"cuota":4233},{"u":202,"piso":2,"estado":"Disponible","cub":91.48,"semi":10.34,"tot":101.82,"ff":233521,"lanz":247257,"lista":274730,"reserva":11676,"boleto":70056,"saldo":151789,"cuota":6325},{"u":205,"piso":2,"estado":"Disponible","cub":90.2,"semi":14.11,"tot":104.31,"ff":237505,"lanz":251476,"lista":279418,"reserva":11875,"boleto":71251,"saldo":154378,"cuota":6432},{"u":209,"piso":2,"estado":"Disponible","cub":63.51,"semi":6.03,"tot":69.54,"ff":159594,"lanz":174052,"lista":193391,"reserva":7980,"boleto":47878,"saldo":103736,"cuota":4322},{"u":212,"piso":2,"estado":"Disponible","cub":61.63,"semi":6.03,"tot":67.66,"ff":155280,"lanz":169346,"lista":188162,"reserva":7764,"boleto":46584,"saldo":100932,"cuota":4205},{"u":302,"piso":3,"estado":"Disponible","cub":91.48,"semi":10.34,"tot":101.82,"ff":237845,"lanz":251836,"lista":279818,"reserva":11892,"boleto":71354,"saldo":154599,"cuota":6442},{"u":305,"piso":3,"estado":"Disponible","cub":90.38,"semi":14.11,"tot":104.49,"ff":242324,"lanz":256578,"lista":285087,"reserva":12116,"boleto":72697,"saldo":157511,"cuota":6563},{"u":307,"piso":3,"estado":"Disponible","cub":74.51,"semi":13.26,"tot":87.77,"ff":203638,"lanz":215617,"lista":239574,"reserva":10182,"boleto":61091,"saldo":132365,"cuota":5515},{"u":308,"piso":3,"estado":"Disponible","cub":62.98,"semi":5.96,"tot":68.94,"ff":161147,"lanz":175745,"lista":195273,"reserva":8057,"boleto":48344,"saldo":104746,"cuota":4364},{"u":313,"piso":3,"estado":"Disponible","cub":70.81,"semi":9.42,"tot":80.23,"ff":187538,"lanz":198569,"lista":220632,"reserva":9377,"boleto":56261,"saldo":121899,"cuota":5079},{"u":403,"piso":4,"estado":"Disponible","cub":103.08,"semi":21.78,"tot":124.86,"ff":301972,"lanz":319735,"lista":355262,"reserva":15099,"boleto":90592,"saldo":196282,"cuota":8178},{"u":407,"piso":4,"estado":"Disponible","cub":74.54,"semi":13.19,"tot":87.73,"ff":214682,"lanz":227310,"lista":252567,"reserva":10734,"boleto":64405,"saldo":139543,"cuota":5814},{"u":412,"piso":4,"estado":"Disponible","cub":61.55,"semi":5.95,"tot":67.5,"ff":166388,"lanz":181460,"lista":201622,"reserva":8319,"boleto":49916,"saldo":108152,"cuota":4506}];
+const PLAN = {reserva:0.05, boleto:0.30, cuotas:24};
+
+const fmtUSD = n => 'USD ' + Math.round(n).toLocaleString('es-AR');
+const fmtN = n => Math.round(n).toLocaleString('es-AR');
+const fmtM2 = n => n.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' m²';
+const pct = n => (n*100).toLocaleString('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1}) + '%';
+const $ = id => document.getElementById(id);
+const lado = u => (u % 100) <= 6 ? 'Greenville' : 'Abril';
+
+// Estado: lo del Excel como base; lo compartido (en vivo) manda.
+const estados = {};
+UNIDADES.forEach(x => estados[x.u] = x.estado === 'Reservada' ? 'Reservada' : (x.estado === 'Vendida' ? 'Vendida' : 'Disponible'));
+let puedeEditar = false, desbloqueado = false, db = null, abierta = null;
+const equipo = () => puedeEditar && desbloqueado;
+let filtro = 'todos', orden = 'piso';
+const guardando = new Set();
+
+function toast(t){ const el=$('toast'); el.textContent=t; el.style.display='block'; clearTimeout(toast._t); toast._t=setTimeout(()=>el.style.display='none',3500); }
+
+function pillHTML(e){
+  if (e === 'Disponible') return '<span class="pill disp"><span class="rombo" aria-hidden="true"></span>Disponible</span>';
+  return `<span class="pill res"><span class="rombo" aria-hidden="true"></span>${e}</span>`;
+}
+function switchHTML(u){
+  const on = estados[u] !== 'Disponible';
+  return `<button type="button" class="switch" role="switch" aria-checked="${on}" data-u="${u}" ${guardando.has(u)?'disabled':''} aria-label="Reservar unidad ${u}"><span class="caps" aria-hidden="true"><i></i></span><span>${on?'Reservada':'Reservar'}</span></button>`;
+}
+
+function visibles(){
+  let l = UNIDADES.filter(x => filtro==='todos' || String(x.piso)===filtro);
+  if (orden==='precio') l = [...l].sort((a,b)=>a.ff-b.ff);
+  else if (orden==='sup') l = [...l].sort((a,b)=>b.tot-a.tot);
+  return l;
+}
+
+function renderResumen(){
+  const disp = UNIDADES.filter(x => estados[x.u]==='Disponible');
+  $('d-disp').textContent = disp.length;
+  const base = disp.length ? disp : UNIDADES;
+  $('d-desde').textContent = fmtUSD(Math.min(...base.map(x=>x.ff)));
+  $('d-sup').textContent = `${fmtN(Math.min(...base.map(x=>x.tot)))} a ${fmtN(Math.max(...base.map(x=>x.tot)))} m²`;
+  $('d-disp').nextElementSibling.textContent = disp.length===1 ? 'studio disponible' : 'studios disponibles';
+}
+
+function renderChips(){
+  const pisos = [...new Set(UNIDADES.map(x=>x.piso))];
+  const ops = [['todos','Todos']].concat(pisos.map(p=>[String(p), p+'º piso']));
+  $('chips').innerHTML = ops.map(([v,t]) => `<button type="button" class="chip" data-f="${v}" aria-pressed="${filtro===v}">${t}</button>`).join('');
+}
+
+function renderLista(){
+  const l = visibles();
+  $('filas').innerHTML = l.length ? l.map(x => {
+    const e = estados[x.u];
+    return `<div class="fila ${e!=='Disponible'?'reservada':''}" role="button" tabindex="0" data-u="${x.u}" aria-label="Ver ficha de la unidad ${x.u}">
+      <img class="mini" src="img/mini_${x.u}.png" alt="" loading="lazy">
+      <div class="c-u"><div class="u-num">${x.u}.</div><div class="u-piso">${x.piso}º piso · Lado ${lado(x.u)}</div></div>
+      <div class="c-s num"><div class="big">${fmtM2(x.tot)}</div><div class="sub">${fmtM2(x.cub)} cubiertos · ${fmtM2(x.semi)} semicubiertos</div></div>
+      <div class="c-p num"><div class="big">${fmtUSD(x.ff)}</div><div class="sub">${fmtN(x.ff/x.tot)} USD/m²</div></div>
+      <div class="c-e estado">${equipo() ? switchHTML(x.u) : pillHTML(e)}</div>
+      <span class="flecha" aria-hidden="true">→</span>
+    </div>`;
+  }).join('') : '<div class="vacio">No hay unidades en este piso.</div>';
+}
+
+function renderFicha(){
+  if (!abierta) return;
+  const x = UNIDADES.find(y => y.u===abierta);
+  const e = estados[x.u];
+  $('f-titulo').textContent = `Unidad ${x.u}.`;
+  $('f-piso').textContent = `${x.piso}º piso · Lado ${lado(x.u)}`;
+  $('f-estado').innerHTML = pillHTML(e);
+  $('f-img').src = `img/plano_${x.u}.png`;
+  $('f-img').alt = `Plano de la unidad ${x.u}`;
+  $('f-precio').textContent = fmtUSD(x.ff);
+  $('f-m2').textContent = `${fmtN(x.ff/x.tot)} USD/m² · plan financiado`;
+  $('f-sup').innerHTML = `<tr><td>Cubierta</td><td>${fmtM2(x.cub)}</td></tr><tr><td>Semicubierta</td><td>${fmtM2(x.semi)}</td></tr><tr class="total"><td>Total</td><td>${fmtM2(x.tot)}</td></tr>`;
+  const etapas = [['Hoy','Friends & Family',x.ff,true],['Lanzamiento','Precio previsto',x.lanz,false],['Lista','Precio previsto',x.lista,false]];
+  const max = x.lista;
+  $('f-evo').innerHTML = etapas.map(([t,s,v,hoy]) => `<div class="barra ${hoy?'hoy':''}"><div class="lab">${t}<small>${s}</small></div><div class="pista"><div class="fill num" style="width:${Math.max(38,v/max*100)}%">${fmtUSD(v)}</div></div></div>`).join('')
+    + `<div class="ganancia num"><span>Revalorización prevista hasta Lista: ${fmtUSD(x.lista-x.ff)}</span><b>+${pct(x.lista/x.ff-1)}</b></div>`
+    + `<div class="leyenda num">USD/m²: ${fmtN(x.ff/x.tot)} hoy · ${fmtN(x.lanz/x.tot)} en Lanzamiento · ${fmtN(x.lista/x.tot)} en Lista</div>`;
+  $('f-plan').innerHTML = `<tr><td>Reserva (${Math.round(PLAN.reserva*100)}%)</td><td>${fmtUSD(x.reserva)}</td></tr>
+    <tr><td>Boleto (${Math.round(PLAN.boleto*100)}%)</td><td>${fmtUSD(x.boleto)}</td></tr>
+    <tr><td>Saldo (${Math.round((1-PLAN.reserva-PLAN.boleto)*100)}%)</td><td>${fmtUSD(x.saldo)}</td></tr>
+    <tr class="total"><td>${PLAN.cuotas} cuotas de</td><td>${fmtUSD(x.cuota)}</td></tr>`;
+  const vs = VISTAS[x.u] || [];
+  $('f-vistas').closest('.bloque').hidden = !vs.length;
+  $('f-vistas').innerHTML = vs.map((v,i) => `<button type="button" data-i="${i}" aria-label="Ver la vista de la unidad ${x.u} en grande"><img src="${v.mini}" alt="Vista desde la unidad ${x.u}${v.lateral?', lateral':''}"><span>${v.lateral?'Vista lateral · ':''}Ver en grande</span></button>`).join('');
+  $('f-ubic').src = `img/ubicacion_${x.u}.png`;
+  $('f-ubic').alt = `Ubicación de la unidad ${x.u} en el ${x.piso}º piso`;
+  $('f-ubic-txt').textContent = `Planta del ${x.piso}º piso. La ${x.u} está marcada en damasco, del lado ${lado(x.u)}.`;
+  $('l-g').classList.toggle('activo', lado(x.u)==='Greenville'); $('l-a').classList.toggle('activo', lado(x.u)==='Abril');
+  const ed = $('f-edit');
+  ed.hidden = !equipo();
+  ed.innerHTML = equipo() ? switchHTML(x.u) : '';
+  const l = visibles(), i = l.findIndex(y => y.u===x.u);
+  $('f-prev').disabled = i<=0; $('f-next').disabled = i<0 || i>=l.length-1;
+  $('f-prev').dataset.u = i>0 ? l[i-1].u : ''; $('f-next').dataset.u = (i>=0 && i<l.length-1) ? l[i+1].u : '';
+}
+
+function render(){ renderResumen(); renderLista(); renderFicha(); renderReservas(); }
+
+function abrir(u, push=true){
+  abierta = Number(u);
+  $('ficha').classList.add('abierta');
+  document.body.style.overflow='hidden';
+  renderFicha();
+  $('ficha').scrollTop = 0;
+  if (push && location.hash !== '#unidad-'+u) history.replaceState(null,'','#unidad-'+u);
+  $('f-cerrar').focus();
+}
+function cerrar(){
+  const u = abierta; abierta = null;
+  $('ficha').classList.remove('abierta');
+  document.body.style.overflow='';
+  if (location.hash) history.replaceState(null,'',location.pathname+location.search);
+  const f = document.querySelector(`.fila[data-u="${u}"]`); if (f) f.focus();
+}
+function desdeHash(){
+  const h = location.hash;
+  if (['#video','#renders','#vistas'].includes(h)){ abrirVisor(h.slice(1), false); return; }
+  if (visor){ visor = null; $('v-cuerpo').innerHTML = ''; $('visor').classList.remove('abierto'); document.body.style.overflow=''; }
+  const m = h.match(/^#unidad-(\d+)$/);
+  if (m && UNIDADES.some(x=>x.u===Number(m[1]))) abrir(m[1], false);
+  else if (abierta) cerrar();
+}
+
+// ---- Reservas (solo editores) ----
+const RES_PATH = 'privado/reservas/items';
+let reservas = {};          // id -> datos
+let user = null, downloads = null, modalU = null;
+const activa = u => Object.entries(reservas).find(([id,r]) => r.unidad===u && r.estado==='Activa');
+const fechaTxt = iso => { try { return new Date(iso).toLocaleString('es-AR',{dateStyle:'short',timeStyle:'short'}); } catch(_) { return iso || ''; } };
+
+function abrirModal(id){ $(id).classList.add('abierto'); }
+function cerrarModal(id){ $(id).classList.remove('abierto'); modalU = null; }
+
+function alternar(u){
+  if (!db || guardando.has(u)) return;
+  modalU = u;
+  const x = UNIDADES.find(y=>y.u===u);
+  if (estados[u]==='Disponible'){
+    $('m-res-tit').textContent = `Reservar ${u}.`;
+    $('m-res-sub').textContent = `${x.piso}º piso · Lado ${lado(u)} · ${fmtUSD(x.ff)}`;
+    $('f-res').reset(); $('r-error').textContent=''; $('r-ok').disabled=false;
+    abrirModal('m-res'); $('r-nombre').focus();
+  } else {
+    const a = activa(u);
+    $('m-lib-tit').textContent = `Liberar ${u}.`;
+    $('m-lib-txt').textContent = a ? `La reserva de ${a[1].nombre} ${a[1].apellido} (${a[1].telefono}) pasa al historial y la unidad vuelve a estar disponible.` : 'La unidad vuelve a estar disponible.';
+    $('l-error').textContent=''; $('l-ok').disabled=false;
+    abrirModal('m-lib'); $('l-ok').focus();
+  }
+}
+
+async function confirmarReserva(e){
+  e.preventDefault();
+  const u = modalU; if (!u) return;
+  const nombre = $('r-nombre').value.trim(), apellido = $('r-apellido').value.trim(), telefono = $('r-tel').value.trim();
+  if (!nombre || !apellido || !telefono){ $('r-error').textContent = 'Completá nombre, apellido y teléfono.'; return; }
+  if (telefono.replace(/\D/g,'').length < 8){ $('r-error').textContent = 'Revisá el teléfono: tiene que tener al menos 8 números.'; return; }
+  $('r-ok').disabled = true; guardando.add(u); render();
+  try {
+    const actual = await db.collection('estados').doc(String(u)).get();
+    if (actual.exists && actual.data().estado && actual.data().estado !== 'Disponible'){
+      $('r-error').textContent = 'Otra persona acaba de reservar esta unidad.'; $('r-ok').disabled=false; return;
+    }
+    let por = null; try { por = user ? await user.id() : null; } catch(_) {}
+    const x = UNIDADES.find(y=>y.u===u);
+    const ref = await db.collection(RES_PATH).add({unidad:u, nombre, apellido, telefono, fecha:new Date().toISOString(), estado:'Activa', por, precio:x.ff});
+    await db.collection('estados').doc(String(u)).set({estado:'Reservada', reserva:ref.id});
+    estados[u] = 'Reservada';
+    cerrarModal('m-res'); toast(`Unidad ${u} reservada a nombre de ${nombre} ${apellido}.`);
+  } catch(err){
+    $('r-ok').disabled = false;
+    $('r-error').textContent = (err && err.code==='invalid_argument') ? 'No tenés permiso para reservar unidades.' : 'No se pudo guardar la reserva. Probá de nuevo en un momento.';
+  } finally { guardando.delete(u); render(); }
+}
+
+async function confirmarLiberar(){
+  const u = modalU; if (!u) return;
+  $('l-ok').disabled = true; guardando.add(u); render();
+  try {
+    const a = activa(u);
+    if (a) await db.collection(RES_PATH).doc(a[0]).update({estado:'Liberada', liberada:new Date().toISOString()});
+    await db.collection('estados').doc(String(u)).set({estado:'Disponible'});
+    estados[u] = 'Disponible';
+    cerrarModal('m-lib'); toast(`Unidad ${u} liberada.`);
+  } catch(err){
+    $('l-ok').disabled = false;
+    $('l-error').textContent = 'No se pudo liberar la unidad. Probá de nuevo en un momento.';
+  } finally { guardando.delete(u); render(); }
+}
+
+function renderReservas(){
+  $('reservas').hidden = !equipo();
+  $('btn-equipo').hidden = !puedeEditar || desbloqueado;
+  if (!equipo()) return;
+  const act = Object.values(reservas).filter(r=>r.estado==='Activa').sort((a,b)=>a.unidad-b.unidad);
+  $('tabla-res').innerHTML = act.length
+    ? '<thead><tr><th>Unidad</th><th>Nombre</th><th>Apellido</th><th>Teléfono</th><th>Fecha</th><th>Precio F&amp;F</th></tr></thead><tbody>'
+      + act.map(r => `<tr><td class="u">${r.unidad}.</td><td></td><td></td><td></td><td>${fechaTxt(r.fecha)}</td><td>${fmtUSD(r.precio||0)}</td></tr>`).join('') + '</tbody>'
+    : '<tbody><tr><td>Todavía no hay reservas cargadas.</td></tr></tbody>';
+  // textos de terceros: con textContent
+  const filas = $('tabla-res').querySelectorAll('tbody tr');
+  act.forEach((r,i) => { const c = filas[i].children; c[1].textContent=r.nombre||''; c[2].textContent=r.apellido||''; c[3].textContent=r.telefono||''; });
+}
+
+function cargarXLSX(){
+  return new Promise((ok, mal) => {
+    if (window.XLSX) return ok(window.XLSX);
+    const sc = document.createElement('script');
+    sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    sc.onload = () => ok(window.XLSX); sc.onerror = mal;
+    document.head.appendChild(sc);
+  });
+}
+
+async function descargarExcel(){
+  const b = $('btn-excel'); b.disabled = true;
+  try {
+    if (!downloads) downloads = await window.claude.use('downloads');
+    if (!downloads){ toast('Desde acá no se puede descargar. Abrí la página en claude.ai.'); return; }
+    const XLSX = await cargarXLSX();
+    const todas = Object.values(reservas).sort((a,b)=>a.unidad-b.unidad || String(a.fecha).localeCompare(String(b.fecha)));
+    let nombres = {};
+    try { const ids=[...new Set(todas.map(r=>r.por).filter(Boolean))]; if (ids.length && user) { const ps = await user.profiles(ids); ids.forEach(id => nombres[id] = (ps[id] && ps[id].name) || ''); } } catch(_) {}
+    const fila = r => { const x = UNIDADES.find(y=>y.u===r.unidad) || {}; return {
+      'Unidad': r.unidad, 'Piso': x.piso ? x.piso+'º' : '', 'Lado': lado(r.unidad), 'Sup. total (m²)': x.tot,
+      'Precio F&F (USD)': r.precio || x.ff, 'Nombre': r.nombre, 'Apellido': r.apellido, 'Teléfono': r.telefono,
+      'Fecha de reserva': fechaTxt(r.fecha), 'Cargada por': nombres[r.por] || '' }; };
+    const wb = XLSX.utils.book_new();
+    const act = todas.filter(r=>r.estado==='Activa').map(fila);
+    const h1 = XLSX.utils.json_to_sheet(act.length ? act : [{'Unidad':'Sin reservas activas'}]);
+    h1['!cols'] = [8,6,12,14,16,16,16,16,18,20].map(w=>({wch:w}));
+    XLSX.utils.book_append_sheet(wb, h1, 'Reservadas');
+    const hist = todas.map(r => Object.assign(fila(r), {'Estado': r.estado, 'Fecha de liberación': r.liberada ? fechaTxt(r.liberada) : ''}));
+    const h2 = XLSX.utils.json_to_sheet(hist.length ? hist : [{'Unidad':'Sin movimientos'}]);
+    h2['!cols'] = [8,6,12,14,16,16,16,16,18,20,10,18].map(w=>({wch:w}));
+    XLSX.utils.book_append_sheet(wb, h2, 'Historial');
+    const data = XLSX.write(wb, {type:'array', bookType:'xlsx'});
+    const hoy = new Date().toISOString().slice(0,10);
+    await downloads.save({filename:`Reservas Downtown Studios F&F ${hoy}.xlsx`, data});
+  } catch(err){
+    if (!(err && err.code==='declined')) toast('No se pudo generar el Excel. Probá de nuevo.');
+  } finally { b.disabled = false; }
+}
+
+// ---- Acceso equipo con contraseña ----
+const CLAVE_HASH = '6a47d26acb7135ef6d0816d13886e9a0e3b58efb0e6bfdb9f6f5e920bdd6cfe9';
+let subRes = null;
+async function hashClave(c){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('downtown-studios-ff:' + c));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function abrirPin(){
+  if (!db) return;
+  $('f-pin').reset(); $('p-error').textContent=''; $('p-ok').disabled=false;
+  abrirModal('m-pin'); $('p-1').focus();
+}
+function desbloquear(){
+  desbloqueado = true;
+  if (!subRes) subRes = db.collection(RES_PATH).onSnapshot(snap => {
+    const nuevo = {}; snap.docs.forEach(d => { const v = d.data(); if (v) nuevo[d.id] = v; });
+    reservas = nuevo; render();
+  }, () => {});
+  render();
+  $('reservas').scrollIntoView({behavior:'smooth', block:'start'});
+}
+function bloquear(){
+  desbloqueado = false;
+  if (subRes){ subRes(); subRes = null; }
+  reservas = {}; render(); toast('Acceso del equipo cerrado.');
+}
+async function confirmarPin(e){
+  e.preventDefault();
+  const c = $('p-1').value.trim();
+  if (!c){ $('p-error').textContent = 'Ingresá la contraseña.'; return; }
+  if (await hashClave(c) === CLAVE_HASH){ cerrarModal('m-pin'); desbloquear(); }
+  else { $('p-error').textContent = 'Contraseña incorrecta.'; $('p-1').select(); }
+}
+
+// ---- Video y renders ----
+const RENDERS = [
+  {src:'media/render_01.jpg', mini:'media/render_01_mini.jpg', txt:'Frente sobre el parque, con la Torre 1 al lado'},
+  {src:'media/render_02.jpg', mini:'media/render_02_mini.jpg', txt:'Contrafrente: locales y estacionamiento'},
+];
+const VISTAS = {"102":[{"src":"vistas/vista_102.jpg","mini":"vistas/vista_102_mini.jpg","lateral":false}],"105":[{"src":"vistas/vista_105.jpg","mini":"vistas/vista_105_mini.jpg","lateral":false}],"109":[{"src":"vistas/vista_109.jpg","mini":"vistas/vista_109_mini.jpg","lateral":false}],"202":[{"src":"vistas/vista_202.jpg","mini":"vistas/vista_202_mini.jpg","lateral":false}],"205":[{"src":"vistas/vista_205.jpg","mini":"vistas/vista_205_mini.jpg","lateral":false}],"209":[{"src":"vistas/vista_209.jpg","mini":"vistas/vista_209_mini.jpg","lateral":false}],"212":[{"src":"vistas/vista_212.jpg","mini":"vistas/vista_212_mini.jpg","lateral":false}],"302":[{"src":"vistas/vista_302.jpg","mini":"vistas/vista_302_mini.jpg","lateral":false}],"305":[{"src":"vistas/vista_305.jpg","mini":"vistas/vista_305_mini.jpg","lateral":false}],"307":[{"src":"vistas/vista_307.jpg","mini":"vistas/vista_307_mini.jpg","lateral":false}],"308":[{"src":"vistas/vista_308.jpg","mini":"vistas/vista_308_mini.jpg","lateral":false}],"313":[{"src":"vistas/vista_313.jpg","mini":"vistas/vista_313_mini.jpg","lateral":false},{"src":"vistas/vista_313_lateral.jpg","mini":"vistas/vista_313_lateral_mini.jpg","lateral":true}],"403":[{"src":"vistas/vista_403.jpg","mini":"vistas/vista_403_mini.jpg","lateral":false}],"407":[{"src":"vistas/vista_407.jpg","mini":"vistas/vista_407_mini.jpg","lateral":false}],"412":[{"src":"vistas/vista_412.jpg","mini":"vistas/vista_412_mini.jpg","lateral":false}]};
+const GAL_VISTAS = UNIDADES.flatMap(x => (VISTAS[x.u]||[]).map(v => ({src:v.src, mini:v.mini, u:x.u, txt:`Unidad ${x.u} · ${x.piso}º piso · Lado ${lado(x.u)}${v.lateral?' · vista lateral':''}`})));
+let visor = null, ri = 0, gal = RENDERS;
+function abrirVisor(tipo, push=true, inicio=0){
+  visor = tipo;
+  const c = $('v-cuerpo');
+  if (tipo==='video'){
+    $('v-tit').textContent = 'Video 360.';
+    c.innerHTML = '<video controls playsinline preload="metadata" poster="media/poster.jpg" src="media/vuelo360.mp4"></video>';
+  } else {
+    gal = tipo==='renders' ? RENDERS : (tipo==='vistas' ? GAL_VISTAS : GAL_VISTAS.filter(v => v.u===abierta));
+    $('v-tit').textContent = tipo==='renders' ? 'Renders.' : (tipo==='vistas' ? 'Vistas.' : `Vista ${abierta}.`);
+    c.innerHTML = `<img class="foto" id="r-img" alt="">
+      <div class="v-pie">${gal.length>1?'<button type="button" class="v-nav" id="r-prev" aria-label="Anterior">←</button>':''}<span id="r-txt"></span>${gal.length>1?'<button type="button" class="v-nav" id="r-next" aria-label="Siguiente">→</button>':''}</div>
+      ${gal.length>1?`<div class="miniaturas">${gal.map((r,i)=>`<button type="button" data-i="${i}" aria-label="Imagen ${i+1}"><img src="${r.mini}" alt="" loading="lazy"></button>`).join('')}</div>`:''}`;
+    mostrarRender(inicio);
+  }
+  $('visor').classList.add('abierto'); document.body.style.overflow='hidden';
+  if (push) history.replaceState(null,'','#'+tipo);
+  $('v-cerrar').focus();
+}
+function mostrarRender(i){
+  ri = (i + gal.length) % gal.length;
+  const r = gal[ri];
+  $('r-img').src = r.src; $('r-img').alt = r.txt;
+  $('r-txt').textContent = gal.length>1 ? `${ri+1} de ${gal.length} · ${r.txt}` : r.txt;
+  document.querySelectorAll('.miniaturas button').forEach(b => b.setAttribute('aria-current', String(Number(b.dataset.i)===ri)));
+}
+function cerrarVisor(){
+  visor = null; $('v-cuerpo').innerHTML = '';
+  $('visor').classList.remove('abierto');
+  if (abierta){ history.replaceState(null,'','#unidad-'+abierta); $('f-cerrar').focus(); return; }
+  document.body.style.overflow='';
+  if (location.hash) history.replaceState(null,'',location.pathname+location.search);
+}
+$('t-renders-n').textContent = RENDERS.length + ' imágenes';
+$('t-video').addEventListener('click', () => abrirVisor('video'));
+$('t-renders').addEventListener('click', () => abrirVisor('renders'));
+$('t-vistas').addEventListener('click', () => abrirVisor('vistas'));
+$('f-vistas').addEventListener('click', e => { const b = e.target.closest('button'); if (b) abrirVisor('vista-unidad', false, Number(b.dataset.i)); });
+$('v-cerrar').addEventListener('click', cerrarVisor);
+$('v-cuerpo').addEventListener('click', e => {
+  if (e.target.closest('#r-prev')) mostrarRender(ri-1);
+  else if (e.target.closest('#r-next')) mostrarRender(ri+1);
+  else { const m = e.target.closest('.miniaturas button'); if (m) mostrarRender(Number(m.dataset.i)); }
+});
+
+// Eventos
+$('chips').addEventListener('click', e => { const b=e.target.closest('.chip'); if(!b) return; filtro=b.dataset.f; renderChips(); renderLista(); });
+$('orden').addEventListener('change', e => { orden=e.target.value; renderLista(); });
+document.addEventListener('click', e => {
+  const s = e.target.closest('.switch'); if (s){ e.stopPropagation(); alternar(Number(s.dataset.u)); return; }
+  const f = e.target.closest('.fila'); if (f) abrir(f.dataset.u);
+});
+$('filas').addEventListener('keydown', e => { const f=e.target.closest('.fila'); if(f && e.target===f && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); abrir(f.dataset.u); } });
+$('f-cerrar').addEventListener('click', cerrar);
+$('f-res').addEventListener('submit', confirmarReserva);
+$('f-res').addEventListener('input', () => { $('r-error').textContent=''; });
+$('r-cancelar').addEventListener('click', () => cerrarModal('m-res'));
+$('l-cancelar').addEventListener('click', () => cerrarModal('m-lib'));
+$('l-ok').addEventListener('click', confirmarLiberar);
+$('btn-excel').addEventListener('click', descargarExcel);
+$('btn-equipo').addEventListener('click', abrirPin);
+$('btn-cerrar-eq').addEventListener('click', bloquear);
+$('f-pin').addEventListener('submit', confirmarPin);
+$('f-pin').addEventListener('input', () => { $('p-error').textContent=''; });
+$('p-cancelar').addEventListener('click', () => cerrarModal('m-pin'));
+$('f-prev').addEventListener('click', e => { if(e.currentTarget.dataset.u) abrir(e.currentTarget.dataset.u); });
+$('f-next').addEventListener('click', e => { if(e.currentTarget.dataset.u) abrir(e.currentTarget.dataset.u); });
+document.addEventListener('keydown', e => { if(visor && visor!=='video' && (e.key==='ArrowLeft'||e.key==='ArrowRight')){ mostrarRender(ri + (e.key==='ArrowRight'?1:-1)); return; } if(e.key!=='Escape') return; if(visor) return cerrarVisor(); if($('m-res').classList.contains('abierto')) return cerrarModal('m-res'); if($('m-lib').classList.contains('abierto')) return cerrarModal('m-lib'); if($('m-pin').classList.contains('abierto')) return cerrarModal('m-pin'); if(abierta) cerrar(); });
+window.addEventListener('hashchange', desdeHash);
+
+renderChips(); render(); desdeHash();
+
+// Estados compartidos en vivo
+(async () => {
+  if (!window.claude || !window.claude.use) return;
+  try {
+    user = await window.claude.use('user');
+    db = await window.claude.use('db');
+    if (!db) return;
+    let edit = false;
+    try {
+      if (user) edit = Boolean(await user.isOwner()) || Boolean(await user.canEdit());
+    } catch(_) {}
+    let aviso = setTimeout(() => toast('Los estados en vivo todavía no cargaron; puede que veas la disponibilidad desactualizada.'), 10000);
+    db.collection('estados').onSnapshot(snap => {
+      if (!snap.metadata.fromCache) { clearTimeout(aviso); aviso = null; }
+      snap.docs.forEach(d => {
+        const u = Number(d.id); const v = d.data() && d.data().estado;
+        if (estados[u] !== undefined && !guardando.has(u) && ['Disponible','Reservada','Vendida'].includes(v)) estados[u] = v;
+      });
+      render();
+    }, () => { clearTimeout(aviso); });
+    if (edit){ puedeEditar = true; render(); }
+  } catch(_) {}
+})();
+</script>
+</body>
+</html>
